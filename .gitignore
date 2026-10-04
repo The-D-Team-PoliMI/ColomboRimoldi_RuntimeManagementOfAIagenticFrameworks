@@ -53,3 +53,9 @@ output/
 
 # Temp folder
 temp/
+
+# Binari e librerie compilate C++
+*.so
+*.a
+*.o
+.venv/

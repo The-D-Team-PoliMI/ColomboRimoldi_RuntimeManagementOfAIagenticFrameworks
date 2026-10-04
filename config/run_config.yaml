@@ -8,7 +8,7 @@
 # LLM & PROVIDER
 # =============================================================================
 agent:
-  model: "gemma4:31b"
+  model: "mistral-8k"
   provider: "ollama"                     # "openai" or "ollama"
   ollama_url: "http://localhost:11434"   # ignored when provider=openai
   openai_api_key: null                   # null = read from OPENAI_API_KEY env var
@@ -79,8 +79,8 @@ steps:
     ollama_url: null
     n: 1
     bon_param: "temperature"
-    temp_min: 1.0
-    temp_max: 1.0
+    temp_min: 1
+    temp_max: 1
     max_tokens: 2000
     top_p_min: 0.95
     top_p_max: 0.95
@@ -105,8 +105,8 @@ schema:
 # RUN PARAMETERS
 # =============================================================================
 run:
-  prompt: "Show me the sales in Nov 2021"
-  visualization_goal: "Sales trend for Nov 2021, with date as x and sales value as y"
+  prompt: "Return the top 5 stores by total revenue, identified by store number."
+  visualization_goal: ""
   agent_mode: "full"           # "lookup_only", "analysis", or "full"
   run_id: "test run"                 # null = auto-generate; set for reproducible caching
   save_dir: "./output"
@@ -141,7 +141,7 @@ run:
 # TRACING (optional)
 # =============================================================================
 tracing:
-  enabled: true
+  enabled: false
   phoenix_endpoint: "http://localhost:6006/v1/traces"
   phoenix_api_key: null
   project_name: "evaluating-agent"
