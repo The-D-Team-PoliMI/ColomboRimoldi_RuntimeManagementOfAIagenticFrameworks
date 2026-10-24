@@ -1,23 +1,31 @@
 #include <iostream>
 #include <memory>
+#include <cstdlib>
 #include <agents-cpp/context.h>
 #include <agents-cpp/llm_interface.h>
-#include "lookup_sales_data.h"
-#include "analyzing_data.h"
+#include "config.h"
+#include "schema.h"
+#include "utils.h"
+#include "data_agent.h"
 
 using namespace agent_cpp;
 
 int main() {
+    AgentConfig config;
 
-    std::string model = "mistral-8k";
-    
-    JsonObject state = {
-        {"prompt", "Return the top 5 stores by total revenue, identified by store number."},
-        {"visualization_goal", ""},
-    };
+    // Recupero dell'API key corretta in base al provider
+    std::string api_key = "";
+    if (config.provider == "google") {
+        if (!config.gemini_api_key.empty())
+            api_key = config.gemini_api_key;
+        else
+            std::cerr << "Attenzione: GEMINI_API_KEY non trovata in config o variabile d'ambiente.\n";
+    }
 
-    auto llm = agents::createLLM("ollama", "", model);
-    llm->setApiBase("http://127.0.0.1:11434/api");
+    auto llm = agents::createLLM(config.provider, api_key, config.model);
+    if (config.provider == "ollama") {
+        llm->setApiBase(config.ollama_url);
+    }
 
     auto options = llm->getOptions();
     options.timeout_ms = 600000;
@@ -26,30 +34,37 @@ int main() {
     auto context = std::make_shared<agents::Context>();
     context->setLLM(llm);
 
-    auto schema = agent_cpp::DatabaseSchema::from_data_dir("../data");
-
-    LookupSalesData lookup_agent(context, schema);
-
-    if (!lookup_agent.init_database()){
-        std::cerr << "Errore nel caricamento del database Parquet." << std::endl;
+    // Caricamento schema database
+    DatabaseSchema schema;
+    try {
+        schema = DatabaseSchema::from_data_dir(config.data_dir);
+    } catch (const std::exception& e) {
+        std::cerr << "Errore caricamento schema: " << e.what() << std::endl;
         return 1;
     }
 
-    AnalyzingData analysis_agent(context);
+    // Inizializzazione DuckDB
+    duckdb_database db = nullptr;
+    duckdb_connection con = nullptr;
+    if (duckdb_open(nullptr, &db) == DuckDBError || duckdb_connect(db, &con) == DuckDBError || !init_database(con, schema)) {
+        std::cerr << "Errore inizializzazione DuckDB." << std::endl;
+        return 1;
+    }
 
-    // 1. Step: Lookup SQL su DuckDB
-    std::cout << "Initizalizing lookup sales agent\n\n";
-    std::cout << "Model: " << model << std::endl;
-    std::cout << "Prompt: " << state.value("prompt", "") << std::endl;
+    // Avvio del workflow
+    SalesDataAgent agent(context, config, schema, con);
+    JsonObject result = agent.run_with_goal(
+        "Show promo vs non-promo revenue in 2023 as a bar chart.",
+        "bar chart comparing total revenue for promo and non-promo sales in 2023."
+    );
 
-    state = lookup_agent.run(state);
+    if (result.contains("error") && !result["error"].get<std::string>().empty()) {
+        std::cout << "\n[Pipeline Error]: " << result["error"].get<std::string>() << "\n";
+    } else {
+        std::cout << "Risultati generati in answer: " << result["answer"].size() << "\n";
+    }
 
-    // 2. Step: Analisi testuale dei dati ottenuti
-    std::cout << "Initizalizing analyzing data agent\n\n";
-    state = analysis_agent.run(state);
-
-    if (state.contains("error") && !state["error"].get<std::string>().empty()) 
-        std::cout << "[Pipeline Error] " << state["error"].get<std::string>() << "\n";
-
+    duckdb_disconnect(&con);
+    duckdb_close(&db);
     return 0;
 }

@@ -9,17 +9,6 @@ namespace fs = std::filesystem;
 namespace agent_cpp{
 
 std::string DatabaseSchema::get_full_schema_str() const{
-/*     Return full schema details including column descriptions.
-
-        Returns a string like::
-            Table: sales
-            Description: Daily store-level sales transactions
-            Columns:
-              - Sold_Date (DATE): Transaction date
-              - Total_Sale_Value (FLOAT): Total revenue in USD [examples: 100.0, 250.5]
-              - Store_Number (INTEGER): Unique store identifier [NOT NULL]
-               */
-
     std::stringstream ss;
     for (const auto& table : tables) {
         ss << "Table: " << table.name << "\n";
@@ -45,21 +34,19 @@ std::string DatabaseSchema::get_full_schema_str() const{
 }
 
 // costruisce in memoria l'oggetto DatabaseSchema
-DatabaseSchema DatabaseSchema::from_data_dir(const std::string& data_dir) {
+DatabaseSchema DatabaseSchema::from_data_dir(const std::string& data_dir){
     DatabaseSchema schema;
     std::vector<fs::path> schema_files;
 
-    if (!fs::exists(data_dir) || !fs::is_directory(data_dir)) {
+    if (!fs::exists(data_dir) || !fs::is_directory(data_dir))
         throw std::runtime_error("Directory non valida: " + data_dir);
-    }
 
     // Cerca file con pattern *_schema.yaml
-    for (const auto& entry : fs::directory_iterator(data_dir)) {
+    for (const auto& entry : fs::directory_iterator(data_dir)){
         if (entry.is_regular_file()) {
             std::string filename = entry.path().filename().string();
-            if (filename.ends_with("_schema.yaml")) {
+            if (filename.ends_with("_schema.yaml"))
                 schema_files.push_back(entry.path());
-            }
         }
     }
     std::sort(schema_files.begin(), schema_files.end());
@@ -72,9 +59,9 @@ DatabaseSchema DatabaseSchema::from_data_dir(const std::string& data_dir) {
 
         std::string raw_file_path = root["file_path"].as<std::string>();
         fs::path parquet_path = raw_file_path;
-        if (!parquet_path.is_absolute()) {
+        if (!parquet_path.is_absolute())
             parquet_path = path.parent_path() / parquet_path;
-        }
+            
         table.file_path = fs::absolute(parquet_path).string();
 
         if (root["columns"]) {

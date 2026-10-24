@@ -2,60 +2,49 @@
 #include <string>
 #include <vector>
 
-/* Schema definitions for multi-table database support.
-
-This module provides type-safe dataclass models for describing a database's
-tables and columns so the LLM can generate accurate multi-table SQL queries.
- */
-
 namespace agent_cpp{
 
+ /**
+ * @brief Descrizione di una singola colonna di una tabella del database.
+ */
 struct ColumnSchema{
-
-    /* Description of a single column within a table.
-
-    Attributes:
-    name: Column name as it appears in the data file.
-    description: Human-readable description for the LLM.
-    data_type: SQL data type string (e.g., "VARCHAR", "FLOAT", "DATE", "INTEGER").
-    example_values: Optional list of sample values to help the LLM understand the data.
-    nullable: Whether the column can contain NULL values. */
-
-    std::string name;
+    std::string name; 
     std::string description;
     std::string data_type;
     std::vector<std::string> example_values;
     bool nullable = true;
 };
 
+ /**
+ * @brief Descrizione di una tabella del database.
+ */
 struct TableSchema{
-
-/*     Description of a single table backed by a parquet file.
-
-    Attributes:
-        name: Table name to use in DuckDB (must be a valid SQL identifier).
-        description: Human-readable description of what this table contains.
-        file_path: Absolute or relative path to the parquet file.
-        columns: Ordered list of column definitions. */
-
     std::string name;
     std::string description;
     std::string file_path;
     std::vector<ColumnSchema> columns;
 };
 
-class DatabaseSchema{
-
-/*  Container for all tables in the database, with LLM context helpers.
-
-    Attributes:
-        tables: All registered TableSchema objects.
+/**
+ * @brief Container dello schema completo del database con helper di formattazione per i prompt LLM.
  */
+class DatabaseSchema{
+    public:
+        std::vector<TableSchema> tables;
 
-public:
-    std::vector<TableSchema> tables;
-    std::string get_full_schema_str() const;
-    static DatabaseSchema from_data_dir(const std::string& data_dir);
+        /**
+         * @brief Genera una stringa formattata con i dettagli completi di tabelle e colonne da iniettare nel prompt.
+         * @return std::string Rappresentazione testuale dello schema.
+         */
+        std::string get_full_schema_str() const;
+
+        /**
+         * @brief Costruisce l'oggetto DatabaseSchema scansionando tutti i file `*_schema.yaml` in una directory.
+         * @param data_dir Percorso della directory contenente gli schemi YAML e i file Parquet.
+         * @return DatabaseSchema Istanza popolata con tutte le tabelle trovate.
+         * @throws std::runtime_error Se la directory specificata non esiste o non è valida.
+         */
+        static DatabaseSchema from_data_dir(const std::string& data_dir);
 };
 
 } 
