@@ -22,12 +22,16 @@ void SalesDataAgent::apply_step_options(const StepConfig& sc){
     llm->setOptions(opts);
 }
 
-JsonObject SalesDataAgent::execute_step_with_config(const std::string& step_name, JsonObject& state){
+JsonObject SalesDataAgent::execute_step_with_config(const std::string& step_name, const JsonObject& state){
     StepConfig sc = config_.get_step_config(step_name);
     if (!sc.enabled)
         return state;
 
     apply_step_options(sc);
+
+    if (sc.cot_n > 1) 
+        std::cout << "[" << step_name << "] CoT iteration 1/" << sc.cot_n
+                  << ": starting initial run...\n";
 
     JsonObject initial_result = invoke_step_raw(step_name, state);
 
@@ -37,7 +41,7 @@ JsonObject SalesDataAgent::execute_step_with_config(const std::string& step_name
     return initial_result;
 }
 
-JsonObject SalesDataAgent::invoke_step_raw(const std::string& step_name, JsonObject& state) {
+JsonObject SalesDataAgent::invoke_step_raw(const std::string& step_name, const JsonObject& state) {
     if (step_name == "decide_tool")
         return DecideTool(state, context_);
     else if (step_name == "lookup_sales_data")

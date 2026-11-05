@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <vector>
 #include <numeric>
+#include <difflib.h>
 
 namespace agent_cpp{
 
@@ -70,42 +71,11 @@ bool init_database(duckdb_connection con, const DatabaseSchema& schema){
     return true;
 }
 
-// La distanza di Levenshtein calcola il numero minimo di operazioni a singolo carattere 
-// necessarie per trasformare una stringa nell'altra. Viene calcolata tramite un algoritmo di 
-// programmazione dinamica: costruendo una matrice delle distanze prefisse, si trova il costo minimo complessivo
-double sequence_similarity(const std::string& s1, const std::string& s2) {
-    if (s1 == s2) 
-        return 1.0;
-    if (s1.empty() || s2.empty()) 
-        return 0.0;
-
-    // Ottimizzazione: assicuriamo che s2 sia la stringa più corta per usare meno memoria
-    const std::string& a = (s1.size() >= s2.size()) ? s1 : s2;
-    const std::string& b = (s1.size() >= s2.size()) ? s2 : s1;
-
-    const size_t n = a.size();
-    const size_t m = b.size();
-
-    std::vector<size_t> dp(m + 1);
-    std::iota(dp.begin(), dp.end(), 0);
-
-    for (size_t i = 1; i <= n; ++i) {
-        size_t prev = dp[0]; 
-        dp[0] = i;
-
-        for (size_t j = 1; j <= m; ++j) {
-            size_t temp = dp[j]; 
-            if (a[i - 1] == b[j - 1])
-                dp[j] = prev;
-            else
-                dp[j] = 1 + std::min({prev, dp[j], dp[j - 1]});
-            prev = temp;
-        }
-    }
-
-    size_t dist = dp[m];
-    size_t max_len = std::max(s1.size(), s2.size());
-    return 1.0 - (static_cast<double>(dist) / static_cast<double>(max_len));
+// Equivalente di difflib.SequenceMatcher(None, a, b).ratio() di Python.
+// L'ordine degli argomenti conta: in Python a = output precedente, b = nuovo output.
+double sequence_similarity(const std::string& a, const std::string& b) {
+    difflib::SequenceMatcher<std::string> sm(a, b);
+    return sm.ratio();
 }
 
 

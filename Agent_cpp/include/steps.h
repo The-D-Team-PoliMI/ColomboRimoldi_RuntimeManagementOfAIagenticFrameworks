@@ -32,7 +32,7 @@ std::string format_cot_prompt(const std::string& base_prompt, const JsonObject& 
  * @param schema Schema del database.
  * @return JsonObject Stato aggiornato con il campo `tool_choice`.
  */
-JsonObject DecideTool(JsonObject& state, std::shared_ptr<agents::Context> context);
+JsonObject DecideTool(const JsonObject& state, std::shared_ptr<agents::Context> context);
 
 /**
  * @brief Nodo di data lookup: genera una query SQL tramite LLM e la esegue su DuckDB.
@@ -42,8 +42,7 @@ JsonObject DecideTool(JsonObject& state, std::shared_ptr<agents::Context> contex
  * @param con Connessione DuckDB su cui eseguire la query generata.
  * @return JsonObject Stato aggiornato con `sql_query`, `data` (CSV) o `error`.
  */
-JsonObject LookupSalesData(JsonObject& state, std::shared_ptr<agents::Context> context, const DatabaseSchema& schema, duckdb_connection con);
-
+JsonObject LookupSalesData(const JsonObject& state, std::shared_ptr<agents::Context> context, const DatabaseSchema& schema, duckdb_connection con);
 /**
  * @brief Nodo di analisi: genera un'analisi testuale basata sui dati estratti e sulle statistiche pre-calcolate.
  * @param state Stato contenente i dati CSV (`data`) e la query (`sql_query`).
@@ -51,7 +50,7 @@ JsonObject LookupSalesData(JsonObject& state, std::shared_ptr<agents::Context> c
  * @param schema Schema del database.
  * @return JsonObject Stato con l'analisi aggiunta alla lista `answer`.
  */
-JsonObject AnalyzingData(JsonObject& state, std::shared_ptr<agents::Context> context);
+JsonObject AnalyzingData(const JsonObject& state, std::shared_ptr<agents::Context> context);
 
 /**
  * @brief Nodo di visualizzazione: estrae la configurazione JSON del grafico, genera il codice Matplotlib e lo valida.
@@ -60,6 +59,5 @@ JsonObject AnalyzingData(JsonObject& state, std::shared_ptr<agents::Context> con
  * @param schema Schema del database.
  * @return JsonObject Stato aggiornato con `chart_config`, codice Python in `answer` ed eventuale errore di validazione.
  */
-JsonObject CreateVisualization(JsonObject& state, std::shared_ptr<agents::Context> context);
-
+JsonObject CreateVisualization(const JsonObject& state, std::shared_ptr<agents::Context> context);
 } 

@@ -185,7 +185,8 @@ static std::string clean_sql_output(const std::string& raw_output){
     return cleaned.substr(first, (last - first + 1));
 }
 
-JsonObject LookupSalesData(JsonObject& state, std::shared_ptr<agents::Context> context, const DatabaseSchema& schema, duckdb_connection con){
+JsonObject LookupSalesData(const JsonObject& in_state, std::shared_ptr<agents::Context> context, const DatabaseSchema& schema, duckdb_connection con){
+    JsonObject state = in_state;
     std::string prompt = state.value("prompt", "");
     std::string visualization_goal = state.value("visualization_goal", "");
     if(visualization_goal.empty())
@@ -350,7 +351,8 @@ static std::string enrich_csv_with_stats(const std::string& csv_data){
     return out.str();
 }
 
-JsonObject AnalyzingData(JsonObject& state, std::shared_ptr<agents::Context> context){
+JsonObject AnalyzingData(const JsonObject& in_state, std::shared_ptr<agents::Context> context){
+    JsonObject state = in_state;
     if(state.contains("error") && !state["error"].get<std::string>().empty()) 
         return state;
 
@@ -512,7 +514,8 @@ static const std::string DECISION_PROMPT = R"(You are a workflow orchestrator ma
     Respond with ONLY the tool name: lookup_sales_data, analyzing_data, create_visualization, or end
     No explanations. Just the tool name.)";
 
-JsonObject DecideTool(JsonObject& state, std::shared_ptr<agents::Context> context){
+JsonObject DecideTool(const JsonObject& in_state, std::shared_ptr<agents::Context> context){
+    JsonObject state = in_state;
     if(state.contains("error") && !state["error"].get<std::string>().empty()) 
         return state;
 
@@ -520,7 +523,8 @@ JsonObject DecideTool(JsonObject& state, std::shared_ptr<agents::Context> contex
     std::string answer = state.contains("answer") ? state["answer"].dump() : "[]";
     std::string visualization_goal = state.value("visualization_goal", "");
     std::string last_tool = state.value("tool_choice", "None");
-    bool has_data = state.contains("data") && !state["data"].get<std::string>().empty();
+    bool has_data = state.contains("data") && state["data"].is_string() && !state["data"].get<std::string>().empty();
+    size_t answer_count = (state.contains("answer") && state["answer"].is_array()) ? state["answer"].size() : 0;
 
     std::string formatted_prompt = DECISION_PROMPT;
     replace_all(formatted_prompt, "{prompt}", prompt);
@@ -534,7 +538,11 @@ JsonObject DecideTool(JsonObject& state, std::shared_ptr<agents::Context> contex
         auto response = llm->chat(formatted_cot_prompt);
         std::string raw_response = response.content;
 
-        std::transform(raw_response.begin(), raw_response.end(), raw_response.begin(), ::tolower);
+        // trim + lowercase 
+        auto not_space = [](unsigned char c){ return !std::isspace(c); };
+        raw_response.erase(raw_response.begin(), std::find_if(raw_response.begin(), raw_response.end(), not_space));
+        raw_response.erase(std::find_if(raw_response.rbegin(), raw_response.rend(), not_space).base(), raw_response.end());
+        std::transform(raw_response.begin(), raw_response.end(), raw_response.begin(), [](unsigned char c){ return std::tolower(c); });
 
         const std::vector<std::string> valid_tools = {
             "lookup_sales_data",
@@ -552,14 +560,39 @@ JsonObject DecideTool(JsonObject& state, std::shared_ptr<agents::Context> contex
             }
         }
 
+        // se non contiene il nome di nessun tool, prendiamo il più simile (solo se similarity > 0.6)
+        if (matched_tool.empty()){
+            double best_score = -1.0;
+            for (const auto& tool : valid_tools){
+                double score = sequence_similarity(tool, raw_response);  
+                if (score < 0.6) continue;
+                if (score > best_score || (score == best_score && tool > matched_tool)){
+                    best_score = score;
+                    matched_tool = tool;
+                }
+            }
+        }
+
+        // Altrimenti andiamo su lookup_sales_data
+        if (matched_tool.empty())
+            matched_tool = "lookup_sales_data";
+
+        const std::string llm_choice = matched_tool;
+
         // Guard rails
         if ((matched_tool == "analyzing_data" || matched_tool == "create_visualization") && !has_data)
             matched_tool = "lookup_sales_data";
-        if (matched_tool == "lookup_sales_data" && last_tool == "lookup_sales_data" && !has_data)
+
+        if (matched_tool == "lookup_sales_data" && last_tool == "lookup_sales_data" && !has_data){
+            std::cout << "[decide_tool] lookup_sales_data already ran but returned no data — forcing end to avoid infinite loop\n";
             matched_tool = "end";
-        else if (state.contains("answer") && state["answer"].is_array() && state["answer"].size() > 1)
+        } else if (answer_count > 1)
             matched_tool = "end";
 
+        if (matched_tool != llm_choice)
+            std::cout << "[decide_tool] guardrail override: " << llm_choice << " -> " << matched_tool << "\n";
+
+        std::cout << "\n\nTool selected: " << matched_tool << std::endl;
         state["tool_choice"] = matched_tool;
     }
     catch (const std::exception& e) {
@@ -1134,7 +1167,8 @@ static bool execute_matplotlib_code(const std::string& chart_code, const JsonObj
     return true;
 }
 
-JsonObject CreateVisualization(JsonObject& state, std::shared_ptr<agents::Context> context){
+JsonObject CreateVisualization(const JsonObject& in_state, std::shared_ptr<agents::Context> context){
+    JsonObject state = in_state;
 
     if(state.contains("error") && !state["error"].get<std::string>().empty()) 
         return state;
@@ -1158,6 +1192,7 @@ JsonObject CreateVisualization(JsonObject& state, std::shared_ptr<agents::Contex
 
         config = parse_chart_config(raw_response);
         state["chart_config"] = config;
+        std::cout << "\nChart Configuration:\n" << config.dump(2) << "\n" << std::endl;
 
         std::string formatted_chart_prompt = CREATE_CHART_PROMPT;
         replace_all(formatted_chart_prompt, "{config}", config.dump());
@@ -1171,6 +1206,7 @@ JsonObject CreateVisualization(JsonObject& state, std::shared_ptr<agents::Contex
         replace_all(chart_code, "```python", "");
         replace_all(chart_code, "```", "");
         replace_all(chart_code, "plt.show()", "");
+        std::cout << "Generated Chart Code:\n" << chart_code << "\n" << std::endl;  
 
         std::string out_error = "";
         std::string csv_file_path = "Output/result.csv"; 
@@ -1179,8 +1215,10 @@ JsonObject CreateVisualization(JsonObject& state, std::shared_ptr<agents::Contex
             state["error"] = "Visualization code error: " + out_error;
             std::cerr << "[create_visualization] Validation Error:\n" << out_error << std::endl;
         }
-        else 
+        else{
             state["error"] = "";
+            std::cout << "[create_visualization] Chart saved to Output/chart.png\n"; 
+        }
 
 
         if (!state.contains("answer") || !state["answer"].is_array())

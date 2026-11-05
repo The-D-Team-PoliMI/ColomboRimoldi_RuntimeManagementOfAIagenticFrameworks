@@ -33,6 +33,7 @@ include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/include
     ${AGENTS_SDK_DIR}/include
     ${CMAKE_CURRENT_SOURCE_DIR}/third_party/json
+    ${CMAKE_CURRENT_SOURCE_DIR}/third_party/difflib
 )
 
 

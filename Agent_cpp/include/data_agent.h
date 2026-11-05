@@ -56,7 +56,7 @@ class SalesDataAgent {
          * @param state Stato corrente della pipeline.
          * @return JsonObject Stato aggiornato dopo la singola esecuzione dello step.
          */
-        JsonObject invoke_step_raw(const std::string& step_name, JsonObject& state);
+        JsonObject invoke_step_raw(const std::string& step_name, const JsonObject& state);
 
         /**
          * @brief Finalizza e ripulisce lo stato al termine delle iterazioni CoT di uno step.
@@ -94,8 +94,7 @@ class SalesDataAgent {
          * @param state Stato corrente dell'agente.
          * @return JsonObject Stato aggiornato al termine dello step.
          */
-        JsonObject execute_step_with_config(const std::string& step_name, JsonObject& state);
-
+        JsonObject execute_step_with_config(const std::string& step_name, const JsonObject& state);
         /**
          * @brief Imposta sul client LLM i parametri di campionamento definiti nello StepConfig.
          * @param sc Configurazione dello step corrente.
