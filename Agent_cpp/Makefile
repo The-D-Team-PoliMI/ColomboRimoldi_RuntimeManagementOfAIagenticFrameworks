@@ -7,7 +7,7 @@ build:
 	@cmake --build build -j$$(nproc) > /dev/null
 
 run: build
-	@./build/data_agent_cpp
+	@./build/data_agent_cpp $(ARGS)
 
 clean:
 	@rm -rf build

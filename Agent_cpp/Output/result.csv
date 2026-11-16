@@ -1,3 +1,9 @@
-promotion_status,total_revenue
-Non-Promo,5316412.0739844255
-Promo,99706.86094665527
+region,year,avg_monthly_revenue
+Midwest,2022,10522.09
+Midwest,2023,10821.44
+Northeast,2022,17703.52
+Northeast,2023,14970.11
+South,2022,14925.39
+South,2023,14578.71
+West,2022,12241.59
+West,2023,12129.5

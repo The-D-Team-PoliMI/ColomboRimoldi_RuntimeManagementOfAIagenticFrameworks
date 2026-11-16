@@ -42,6 +42,7 @@ add_executable(data_agent_cpp
     src/schema.cpp
     src/steps.cpp 
     src/utils.cpp
+    src/cache.cpp
     src/data_agent.cpp
 )
 

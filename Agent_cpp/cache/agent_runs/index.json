@@ -1,0 +1,49 @@
+{
+  "runs": [
+    {
+      "prompt": "Compare average monthly revenue between store types for 2022 and 2023",
+      "run_id": "f42d96b1",
+      "timestamp": "2026-11-09T11:02:59"
+    },
+    {
+      "prompt": "Compare average monthly revenue between store types for 2022 and 2023",
+      "run_id": "018f293f",
+      "timestamp": "2026-11-09T11:03:25"
+    },
+    {
+      "prompt": "Compare average monthly revenue between store types for 2022 and 2023",
+      "run_id": "88a0c5cc",
+      "timestamp": "2026-11-09T11:12:49"
+    },
+    {
+      "prompt": "Show store cities where total revenue in 2022 exceeded 200,000 as a bar chart",
+      "run_id": "6854e2de",
+      "timestamp": "2026-11-09T11:16:56"
+    },
+    {
+      "prompt": "Show me the sales in Nov 2021",
+      "run_id": "bench00",
+      "timestamp": "2026-11-14T16:48:12"
+    },
+    {
+      "prompt": "Show the 12 months of 2023 with total revenue and total units sold",
+      "run_id": "bench01",
+      "timestamp": "2026-11-14T16:48:41"
+    },
+    {
+      "prompt": "Return the top 5 stores by total revenue, identified by store number",
+      "run_id": "bench02",
+      "timestamp": "2026-11-14T16:49:01"
+    },
+    {
+      "prompt": "Show total revenue by product brand for 2023 as a bar chart",
+      "run_id": "bench03",
+      "timestamp": "2026-11-14T16:55:12"
+    },
+    {
+      "prompt": "Compare average monthly revenue between store regions for 2022 and 2023",
+      "run_id": "bench04",
+      "timestamp": "2026-11-14T16:56:22"
+    }
+  ]
+}

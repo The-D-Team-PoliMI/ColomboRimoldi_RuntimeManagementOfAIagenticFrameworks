@@ -1,0 +1,152 @@
+[
+  {
+    "index": 0,
+    "prompt_number": 1,
+    "run_id": "bench00",
+    "prompt": "Show me the sales in Nov 2021",
+    "difficulty": 2,
+    "returncode": 0,
+    "wall_sec": 9.001,
+    "csv": 1.0,
+    "text": 0.18,
+    "vis": null,
+    "error": null,
+    "reasoning": {
+      "lookup_sales_data": [
+        null
+      ],
+      "analyzing_data": [
+        null
+      ]
+    },
+    "elapsed_sec": 8.761,
+    "lookup_time_sec": 0.743,
+    "lookup_llm_time_sec": 0.733,
+    "analyzing_time_sec": 1.396,
+    "analyzing_llm_time_sec": 1.395,
+    "vis_time_sec": 3.549,
+    "vis_llm_time_sec": 1.914,
+    "decide_time_sec": 0.631,
+    "decide_llm_time_sec": 0.631
+  },
+  {
+    "index": 1,
+    "prompt_number": 2,
+    "run_id": "bench01",
+    "prompt": "Show the 12 months of 2023 with total revenue and total units sold",
+    "difficulty": 2,
+    "returncode": 0,
+    "wall_sec": 9.473,
+    "csv": 1.0,
+    "text": 0.0457,
+    "vis": null,
+    "error": null,
+    "reasoning": {
+      "lookup_sales_data": [
+        null
+      ],
+      "analyzing_data": [
+        null
+      ]
+    },
+    "elapsed_sec": 9.214,
+    "lookup_time_sec": 0.868,
+    "lookup_llm_time_sec": 0.859,
+    "analyzing_time_sec": 1.128,
+    "analyzing_llm_time_sec": 1.128,
+    "vis_time_sec": 3.442,
+    "vis_llm_time_sec": 1.815,
+    "decide_time_sec": 0.872,
+    "decide_llm_time_sec": 0.872
+  },
+  {
+    "index": 2,
+    "prompt_number": 3,
+    "run_id": "bench02",
+    "prompt": "Return the top 5 stores by total revenue, identified by store number",
+    "difficulty": 1,
+    "returncode": 0,
+    "wall_sec": 4.507,
+    "csv": 0.7033,
+    "text": 0.0912,
+    "vis": null,
+    "error": null,
+    "reasoning": {
+      "lookup_sales_data": [
+        "GT 5 rows, model 5 rows, IOU=0.703. Extra cols: ['store_name']."
+      ],
+      "analyzing_data": [
+        null
+      ]
+    },
+    "elapsed_sec": 4.247,
+    "lookup_time_sec": 0.903,
+    "lookup_llm_time_sec": 0.877,
+    "analyzing_time_sec": 1.106,
+    "analyzing_llm_time_sec": 1.106,
+    "vis_time_sec": null,
+    "vis_llm_time_sec": null,
+    "decide_time_sec": 0.747,
+    "decide_llm_time_sec": 0.746
+  },
+  {
+    "index": 3,
+    "prompt_number": 4,
+    "run_id": "bench03",
+    "prompt": "Show total revenue by product brand for 2023 as a bar chart",
+    "difficulty": 3,
+    "returncode": 0,
+    "wall_sec": 9.188,
+    "csv": 1.0,
+    "text": 0.283,
+    "vis": null,
+    "error": null,
+    "reasoning": {
+      "lookup_sales_data": [
+        null
+      ],
+      "analyzing_data": [
+        null
+      ]
+    },
+    "elapsed_sec": 8.946,
+    "lookup_time_sec": 2.025,
+    "lookup_llm_time_sec": 2.01,
+    "analyzing_time_sec": 0.834,
+    "analyzing_llm_time_sec": 0.834,
+    "vis_time_sec": 2.882,
+    "vis_llm_time_sec": 1.598,
+    "decide_time_sec": 0.624,
+    "decide_llm_time_sec": 0.624
+  },
+  {
+    "index": 4,
+    "prompt_number": 5,
+    "run_id": "bench04",
+    "prompt": "Compare average monthly revenue between store regions for 2022 and 2023",
+    "difficulty": 4,
+    "returncode": 0,
+    "wall_sec": 10.165,
+    "csv": 1.0,
+    "text": 0.3154,
+    "vis": null,
+    "error": null,
+    "reasoning": {
+      "lookup_sales_data": [
+        null
+      ],
+      "analyzing_data": [
+        null
+      ]
+    },
+    "elapsed_sec": 9.92,
+    "lookup_time_sec": 1.018,
+    "lookup_llm_time_sec": 0.99,
+    "analyzing_time_sec": 0.861,
+    "analyzing_llm_time_sec": 0.86,
+    "vis_time_sec": 3.406,
+    "vis_llm_time_sec": 2.097,
+    "decide_time_sec": 0.576,
+    "decide_llm_time_sec": 0.576
+  }
+]

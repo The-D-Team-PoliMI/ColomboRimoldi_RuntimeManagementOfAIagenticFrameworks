@@ -8,6 +8,7 @@
 #include <array>
 #include <cstdio>
 #include <iomanip>
+#include "timing.h"
 
 namespace agent_cpp{
 
@@ -200,7 +201,7 @@ JsonObject LookupSalesData(const JsonObject& in_state, std::shared_ptr<agents::C
     try{
         std::string formatted_cot_prompt = format_cot_prompt(formatted_prompt, state);
         auto llm = context->getLLM();
-        auto response = llm->chat(formatted_cot_prompt);
+        auto response = timed_llm_call([&]{ return llm->chat(formatted_cot_prompt); });
         std::string raw_llm_response = response.content;
 
         std::string sql_query = clean_sql_output(raw_llm_response);
@@ -368,7 +369,7 @@ JsonObject AnalyzingData(const JsonObject& in_state, std::shared_ptr<agents::Con
     try{
         std::string formatted_cot_prompt = format_cot_prompt(formatted_prompt, state);
         auto llm = context->getLLM();
-        auto response = llm->chat(formatted_cot_prompt);
+        auto response = timed_llm_call([&]{ return llm->chat(formatted_cot_prompt); });
         std::string analysis_text = response.content;
 
         std::cout << "Analysis:\n" << analysis_text << "\n" << std::endl;
@@ -535,7 +536,7 @@ JsonObject DecideTool(const JsonObject& in_state, std::shared_ptr<agents::Contex
     try{
         std::string formatted_cot_prompt = format_cot_prompt(formatted_prompt, state);
         auto llm = context->getLLM();
-        auto response = llm->chat(formatted_cot_prompt);
+        auto response = timed_llm_call([&]{ return llm->chat(formatted_cot_prompt); });
         std::string raw_response = response.content;
 
         // trim + lowercase 
@@ -1187,7 +1188,7 @@ JsonObject CreateVisualization(const JsonObject& in_state, std::shared_ptr<agent
     try{
         std::string formatted_cot_configuration_prompt = format_cot_prompt(formatted_configuration_prompt, state);
         auto llm = context->getLLM();
-        auto response = llm->chat(formatted_cot_configuration_prompt);
+        auto response = timed_llm_call([&]{ return llm->chat(formatted_cot_configuration_prompt); });
         std::string raw_response = response.content;
 
         config = parse_chart_config(raw_response);
@@ -1199,10 +1200,10 @@ JsonObject CreateVisualization(const JsonObject& in_state, std::shared_ptr<agent
 
         std::string formatted_cot_chart_prompt = format_cot_prompt(formatted_chart_prompt, state);
 
-        auto code_response = llm->chat(formatted_cot_chart_prompt);
+        auto code_response = timed_llm_call([&]{ return llm->chat(formatted_cot_chart_prompt); });
         std::string chart_code = code_response.content;
 
-        // Pulisci eventuali code fences markdown e plt.show()
+        // Pulisce eventuali code fences markdown e plt.show()
         replace_all(chart_code, "```python", "");
         replace_all(chart_code, "```", "");
         replace_all(chart_code, "plt.show()", "");

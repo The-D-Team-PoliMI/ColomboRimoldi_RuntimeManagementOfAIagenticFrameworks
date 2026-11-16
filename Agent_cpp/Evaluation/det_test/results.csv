@@ -1,0 +1,6 @@
+prompt_number;run_id;difficulty;csv;text;vis;elapsed_sec;lookup_time_sec;analyzing_time_sec;vis_time_sec;decide_time_sec;lookup_llm_time_sec;analyzing_llm_time_sec;vis_llm_time_sec;decide_llm_time_sec;wall_sec;error;prompt
+1;bench00;2;1.0;0.18;;8.761;0.743;1.396;3.549;0.631;0.733;1.395;1.914;0.631;9.001;;Show me the sales in Nov 2021
+2;bench01;2;1.0;0.0457;;9.214;0.868;1.128;3.442;0.872;0.859;1.128;1.815;0.872;9.473;;Show the 12 months of 2023 with total revenue and total units sold
+3;bench02;1;0.7033;0.0912;;4.247;0.903;1.106;;0.747;0.877;1.106;;0.746;4.507;;Return the top 5 stores by total revenue, identified by store number
+4;bench03;3;1.0;0.283;;8.946;2.025;0.834;2.882;0.624;2.01;0.834;1.598;0.624;9.188;;Show total revenue by product brand for 2023 as a bar chart
+5;bench04;4;1.0;0.3154;;9.92;1.018;0.861;3.406;0.576;0.99;0.86;2.097;0.576;10.165;;Compare average monthly revenue between store regions for 2022 and 2023

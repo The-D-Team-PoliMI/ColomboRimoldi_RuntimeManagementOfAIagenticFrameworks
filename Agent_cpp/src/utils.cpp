@@ -20,6 +20,19 @@ void replace_all(std::string& str, const std::string& from, const std::string& t
     }
 }
 
+bool save_csv_artifact(const std::string& csv_content){
+    namespace fs = std::filesystem;
+    fs::create_directories("Output");
+
+    std::ofstream out_file("Output/result.csv");
+    if(!out_file.is_open()){
+        std::cerr << "[LookupSalesData] Errore apertura file in Output/result.csv\n";
+        return false;
+    }
+    out_file << csv_content;
+    return true;
+}
+
 std::string query_result_to_csv(duckdb_result& result){
     std::stringstream ss;
     idx_t col_count = duckdb_column_count(&result);
@@ -42,17 +55,7 @@ std::string query_result_to_csv(duckdb_result& result){
     }
 
     std::string csv_content = ss.str();
-
-    namespace fs = std::filesystem;
-    fs::create_directories("Output");
-
-    std::ofstream out_file("Output/result.csv");
-    if(out_file.is_open()){
-        out_file << csv_content;
-        out_file.close();
-    } else 
-        std::cerr << "[LookupSalesData] Errore apertura file in Output/result.csv\n";
-
+    save_csv_artifact(csv_content);
     return csv_content;
 }
 

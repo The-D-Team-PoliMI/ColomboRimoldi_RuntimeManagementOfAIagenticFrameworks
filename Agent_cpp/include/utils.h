@@ -14,6 +14,16 @@ namespace agent_cpp {
 void replace_all(std::string& str, const std::string& from, const std::string& to);
 
 /**
+ * @brief Scrive il CSV in `Output/result.csv`, il file che gli step successivi (es. la visualizzazione) leggono.
+ *
+ * Va richiamata anche quando i dati arrivano dalla cache: in quel caso LookupSalesData non viene
+ * eseguito e il file non verrebbe aggiornato.
+ * @param csv_content Contenuto CSV da salvare.
+ * @return true se il file è stato scritto.
+ */
+bool save_csv_artifact(const std::string& csv_content);
+
+/**
  * @brief Converte un risultato DuckDB in formato stringa CSV e lo salva in `Output/result.csv`.
  * @param result Struttura `duckdb_result` prodotta dall'esecuzione di una query.
  * @return std::string Contenuto completo della tabella in formato CSV.
