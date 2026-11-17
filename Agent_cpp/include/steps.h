@@ -1,11 +1,14 @@
 #pragma once
+
 #include <memory>
+#include <string>
+#include <vector>
 #include <nlohmann/json.hpp>
 #include <duckdb.h>
 #include <agents-cpp/context.h>
 #include "schema.h"
 
-namespace agent_cpp{
+namespace agent_cpp {
 
 using JsonObject = nlohmann::json;
 
@@ -29,7 +32,6 @@ std::string format_cot_prompt(const std::string& base_prompt, const JsonObject& 
  * @brief Nodo orchestratore: determina il prossimo tool da eseguire in base allo stato attuale.
  * @param state Stato corrente della conversazione.
  * @param context Contesto con il client LLM.
- * @param schema Schema del database.
  * @return JsonObject Stato aggiornato con il campo `tool_choice`.
  */
 JsonObject DecideTool(const JsonObject& state, std::shared_ptr<agents::Context> context);
@@ -43,11 +45,11 @@ JsonObject DecideTool(const JsonObject& state, std::shared_ptr<agents::Context> 
  * @return JsonObject Stato aggiornato con `sql_query`, `data` (CSV) o `error`.
  */
 JsonObject LookupSalesData(const JsonObject& state, std::shared_ptr<agents::Context> context, const DatabaseSchema& schema, duckdb_connection con);
+
 /**
  * @brief Nodo di analisi: genera un'analisi testuale basata sui dati estratti e sulle statistiche pre-calcolate.
  * @param state Stato contenente i dati CSV (`data`) e la query (`sql_query`).
  * @param context Contesto con il client LLM.
- * @param schema Schema del database.
  * @return JsonObject Stato con l'analisi aggiunta alla lista `answer`.
  */
 JsonObject AnalyzingData(const JsonObject& state, std::shared_ptr<agents::Context> context);
@@ -56,8 +58,8 @@ JsonObject AnalyzingData(const JsonObject& state, std::shared_ptr<agents::Contex
  * @brief Nodo di visualizzazione: estrae la configurazione JSON del grafico, genera il codice Matplotlib e lo valida.
  * @param state Stato contenente i dati CSV e il `visualization_goal`.
  * @param context Contesto con il client LLM.
- * @param schema Schema del database.
  * @return JsonObject Stato aggiornato con `chart_config`, codice Python in `answer` ed eventuale errore di validazione.
  */
 JsonObject CreateVisualization(const JsonObject& state, std::shared_ptr<agents::Context> context);
-} 
+
+} // namespace agent_cpp

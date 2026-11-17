@@ -1202,7 +1202,7 @@ JsonObject CreateVisualization(const JsonObject& in_state, std::shared_ptr<agent
         auto code_response = llm->chat(formatted_cot_chart_prompt);
         std::string chart_code = code_response.content;
 
-        // Pulisci eventuali code fences markdown e plt.show()
+
         replace_all(chart_code, "```python", "");
         replace_all(chart_code, "```", "");
         replace_all(chart_code, "plt.show()", "");
@@ -1233,5 +1233,4 @@ JsonObject CreateVisualization(const JsonObject& in_state, std::shared_ptr<agent
     return state;
 }
 
-
-}
+} // namespace agent_cpp
